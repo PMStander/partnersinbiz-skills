@@ -1,0 +1,34 @@
+{
+  "_comment": "Invalid shapes that must 400 — do not use these patterns.",
+  "cases": [
+    {
+      "name": "foreign-header-block",
+      "expectedErrorContains": "unsupported field(s): data",
+      "payload": {
+        "blocks": [{ "type": "header", "data": { "text": "Nope" } }],
+        "theme": { "id": "pib-std-cmyk", "version": "1.0.0" },
+        "changeSummary": "wrong schema"
+      }
+    },
+    {
+      "name": "missing-required-display-pre-tolerance",
+      "note": "Production now defaults these; still prefer explicit required+display.",
+      "payload": {
+        "blocks": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "title": "SPEC",
+            "content": "Content only"
+          }
+        ],
+        "theme": {
+          "brandName": "Hunt and Gun",
+          "palette": { "bg": "#FFFFFF", "text": "#1a202c", "accent": "#D5A138" },
+          "typography": { "heading": "sans-serif", "body": "sans-serif" }
+        },
+        "changeSummary": "content-only blocks"
+      }
+    }
+  ]
+}

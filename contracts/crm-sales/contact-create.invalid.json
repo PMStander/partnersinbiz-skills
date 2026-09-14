@@ -1,0 +1,23 @@
+{
+  "cases": [
+    {
+      "name": "missing_email",
+      "body": { "name": "Jane Doe" },
+      "expectStatus": 400
+    },
+    {
+      "name": "invalid_email",
+      "body": { "name": "Jane Doe", "email": "not-an-email" },
+      "expectStatus": 400
+    },
+    {
+      "name": "orgId_in_body_is_wrong",
+      "body": {
+        "name": "Jane Doe",
+        "email": "jane@acme.example",
+        "orgId": "do-not-send-orgId-in-body"
+      },
+      "note": "orgId must come from X-Org-Id / session — body orgId is ignored or rejected depending on route"
+    }
+  ]
+}

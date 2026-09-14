@@ -1,0 +1,49 @@
+# Local SEO System - Business Configuration
+# Flat format for easy parsing. Fill this out once, then all scripts read from it.
+# Save as: ~/local-seo/business-config.yaml
+
+# Core Business Info
+business_name: ""                    # e.g. "Acme Plumbing"
+service_type: ""                     # e.g. "plumber", "HVAC contractor", "dentist"
+city: ""                             # e.g. "Austin"
+state: ""                            # e.g. "TX"
+phone: ""                            # e.g. "(512) 555-1234"
+website_url: ""                      # e.g. "https://acmeplumbing.com"
+gbp_url: ""                          # Google Business Profile URL
+email: ""                            # Business email
+
+# Services you offer (one per line)
+services:
+  - ""                               # e.g. "Emergency Plumbing"
+  - ""                               # e.g. "Drain Cleaning"
+  - ""                               # e.g. "Water Heater Installation"
+  - ""                               # e.g. "Sewer Repair"
+
+# Neighborhoods you serve
+neighborhoods:
+  - ""                               # e.g. "Downtown"
+  - ""                               # e.g. "South Congress"
+
+# Surrounding cities (for city page generation)
+surrounding_cities:
+  - ""                               # e.g. "Round Rock"
+  - ""                               # e.g. "Cedar Park"
+
+# Known competitors (leave empty to auto-discover)
+competitors:
+  - ""
+  - ""
+  - ""
+
+# Voice & Tone
+tone: "friendly_local_expert"        # friendly_local_expert | professional | casual
+owner_name: ""                       # First name for personalization
+phrases_we_use: ""                   # e.g. "honest pricing, same-day service"
+phrases_we_avoid: ""                 # e.g. "synergy, leverage"
+
+# Schedule
+posting_frequency: "daily"           # daily | 3x_week | weekly
+report_day: "monday"                 # Day for reports
+
+# Output directory
+output_dir: "~/local-seo"

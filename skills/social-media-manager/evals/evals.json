@@ -1,0 +1,23 @@
+{
+  "skill_name": "social-media-manager",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Schedule a LinkedIn post for Lumen about speed reading science for tomorrow at 9am",
+      "expected_output": "Agent should: 1) Look up Lumen's orgId and LinkedIn account, 2) Use POST /ai/generate with topic 'speed reading science', platform 'linkedin', tone appropriate for Lumen's brand, 3) Create the post via POST /posts/ with status 'scheduled' and scheduledAt set to tomorrow 9am UTC (or converted from user's timezone), 4) Confirm the scheduled post with content preview and time",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "What are the best times to post on Twitter for the Partners in Biz account? Show me last week's analytics too",
+      "expected_output": "Agent should: 1) Call GET /analytics/best-times with platform=twitter and the PIB orgId, 2) Call GET /analytics/ with startDate/endDate for last week, platform=twitter, groupBy=day, 3) Present best times as a clear ranked list with days/hours, 4) Present last week's analytics summary with key metrics (impressions, engagements, engagement rate) broken down by day",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Take this blog post about ERR metrics and repurpose it into tweets, a LinkedIn post, and a Reddit post, then schedule them all for this week",
+      "expected_output": "Agent should: 1) Accept the blog content from the user, 2) Call POST /ai/repurpose with sourcePlatform='blog' and targetPlatforms=['twitter','linkedin','reddit'], 3) Call GET /analytics/best-times for each platform to find optimal schedule slots, 4) Present repurposed content for user review, 5) Use POST /posts/bulk/ to schedule all posts across the week with appropriate times, 6) Confirm all scheduled posts with dates/times/platforms",
+      "files": []
+    }
+  ]
+}

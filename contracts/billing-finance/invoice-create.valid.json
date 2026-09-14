@@ -1,0 +1,15 @@
+{
+  "_comment": "Golden valid POST /invoices body (org from X-Org-Id / auth; include orgId only when skill docs require it for cross-org admin).",
+  "lineItems": [
+    {
+      "description": "Monthly growth retainer",
+      "quantity": 1,
+      "unitPrice": 15000,
+      "unitAmount": 15000
+    }
+  ],
+  "dueDate": "2026-08-01",
+  "taxRate": 15,
+  "currency": "ZAR",
+  "notes": "Agent-drafted invoice — verify totals via GET before sending"
+}

@@ -1,0 +1,12 @@
+{
+  "_comment": "Golden valid POST /crm/contacts body. orgId comes from auth / X-Org-Id — do not put orgId in the body.",
+  "name": "Jane Doe",
+  "email": "jane@acme.example",
+  "phone": "+27821234567",
+  "company": "Acme Example",
+  "source": "manual",
+  "type": "lead",
+  "stage": "new",
+  "tags": ["agent-draft"],
+  "notes": "Created via Hermes skill contract — GET contact after create before claiming success"
+}

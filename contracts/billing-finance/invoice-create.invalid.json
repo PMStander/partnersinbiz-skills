@@ -1,0 +1,14 @@
+{
+  "cases": [
+    {
+      "name": "missing_line_items",
+      "body": { "dueDate": "2026-08-01", "currency": "ZAR" },
+      "expectStatus": 400
+    },
+    {
+      "name": "empty_line_items",
+      "body": { "lineItems": [], "dueDate": "2026-08-01", "currency": "ZAR" },
+      "expectStatus": 400
+    }
+  ]
+}

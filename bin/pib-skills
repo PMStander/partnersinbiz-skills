@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# pib-skills — install / login / status for the Partners in Biz skill pack
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PACK_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+MANIFEST="$PACK_ROOT/manifest.json"
+AUTH_JS="$SCRIPT_DIR/pib-auth.mjs"
+
+die() { echo "error: $*" >&2; exit 1; }
+
+require_node() {
+  command -v node >/dev/null 2>&1 || die "node is required"
+}
+
+pack_version() {
+  node -e "console.log(require('$MANIFEST').packVersion)"
+}
+
+list_skill_paths() {
+  node -e "
+    const fs = require('fs');
+    const path = require('path');
+    const root = path.join('$PACK_ROOT', 'skills');
+    function walk(dir, prefix = '') {
+      if (!fs.existsSync(dir)) return [];
+      const out = [];
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        if (entry.name.startsWith('.')) continue;
+        const rel = prefix ? prefix + '/' + entry.name : entry.name;
+        const abs = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (fs.existsSync(path.join(abs, 'SKILL.md'))) out.push(rel);
+          out.push(...walk(abs, rel));
+        }
+      }
+      return out;
+    }
+    const m = require('$MANIFEST');
+    const tier = process.argv[1] || 'all';
+    if (tier === 'all') {
+      console.log(walk(root).join('\n'));
+      process.exit(0);
+    }
+    if (!m.tiers[tier]) { console.error('unknown tier ' + tier); process.exit(1); }
+    console.log(m.tiers[tier].skills.join('\n'));
+  " "${1:-all}"
+}
+
+cmd_status() {
+  require_node
+  echo "pack: pib-system-skills@$(pack_version)"
+  echo "root: $PACK_ROOT"
+  echo "skills:"
+  list_skill_paths all | sed 's/^/  - /'
+  node "$AUTH_JS" status || true
+}
+
+cmd_install() {
+  require_node
+  local dest="${PIB_SKILLS_DEST:-$HOME/.hermes/skills}"
+  local tier="${1:-all}"
+  mkdir -p "$dest"
+  local skill
+  while IFS= read -r skill; do
+    [ -z "$skill" ] && continue
+    local src="$PACK_ROOT/skills/$skill"
+    local target="$dest/$skill"
+    [ -d "$src" ] || { echo "skip $skill — missing at $src"; continue; }
+    mkdir -p "$(dirname "$target")"
+    if [ -L "$target" ] || [ ! -e "$target" ]; then
+      rm -f "$target"
+      ln -s "$src" "$target"
+      echo "linked $skill -> $src"
+    else
+      echo "skip $skill — non-symlink exists at $target"
+    fi
+  done < <(list_skill_paths "$tier")
+  echo
+  echo "Installed pib-system-skills@$(pack_version) into $dest"
+  echo "Next: ./bin/pib-skills login"
+}
+
+cmd_verify_contracts() {
+  require_node
+  node "$PACK_ROOT/bin/verify-contracts.mjs"
+}
+
+cmd_help() {
+  cat <<EOF
+pib-skills — Partners in Biz system skills pack
+
+Usage:
+  pib-skills status
+  pib-skills install [all|core|growth]
+  pib-skills login
+  pib-skills logout
+  pib-skills whoami
+  pib-skills verify-contracts
+
+Env:
+  PIB_SKILLS_DEST   install target (default: ~/.hermes/skills)
+  PIB_API_BASE      API origin (default: https://partnersinbiz.online)
+  PIB_ACCESS_TOKEN  optional personal token instead of device login
+  PIB_ORG_ID        org id for X-Org-Id
+EOF
+}
+
+main() {
+  local cmd="${1:-status}"
+  shift || true
+  case "$cmd" in
+    status) cmd_status "$@" ;;
+    install) cmd_install "$@" ;;
+    login|logout|whoami) require_node; node "$AUTH_JS" "$cmd" "$@" ;;
+    verify-contracts) cmd_verify_contracts "$@" ;;
+    -h|--help|help) cmd_help ;;
+    *) die "unknown command: $cmd (try help)" ;;
+  esac
+}
+
+main "$@"

@@ -1,0 +1,218 @@
+<!--
+  HyperFrames composition template — Phase 5 video production.
+  ===========================================================
+  Copy this file to <client-workspace>/marketing/videos/V<N>-<slug>/index.html,
+  then substitute the {{...}} placeholders + brand palette + scene copy.
+
+  Required placeholders:
+    {{TITLE}}             — short title shown in <title> tag
+    {{COMP_ID}}           — globally unique id, e.g. v1-ahs-landlord (NOT shared between videos)
+    {{LABEL_PREFIX}}      — list-label word: Myth | Win | Drain | Layer | Must | Vector | Step | Rule | Fact
+    {{STAMP}}             — big stamp text in scene 0 (e.g. "MYTH" / "+ROI" / "577/HR")
+    {{STAMP_KICKER}}      — small uppercase eyebrow above the stamp
+    {{STAMP_SUB}}         — sub-headline below the stamp
+    {{REVEAL_KICKER}}     — eyebrow on the reveal (scene 4)
+    {{REVEAL_HEADLINE}}   — main headline HTML on reveal (use <span class="accent">…</span> for accent)
+    {{REVEAL_ACT}}        — small act/source line under the headline
+    {{REVEAL_PENALTY}}    — supporting body text on the reveal (use <strong>…</strong> for highlight)
+    {{END_TAGLINE}}       — end-card tagline
+    {{END_WORDMARK}}      — end-card big wordmark (e.g. "PiB" / "AHS")
+    {{END_FULLNAME}}      — full brand name uppercase under the wordmark
+    {{I1_TITLE..I3_TITLE}}, {{I1_CONTEXT..I3_CONTEXT}}, {{I1_TAG..I3_TAG}} — three list items
+
+  Brand palette: replace the :root variables below with the client's
+  campaign.brandIdentity.palette values. Do NOT leave PiB defaults if
+  rendering for a different client.
+
+  HARD lint requirements (will fail render if missing):
+    - Root composition: data-composition-id, data-width, data-height, data-start, data-duration
+    - Each scene: class="scene clip" + data-start + data-duration
+    - GSAP timeline: paused: true, registered on window.__timelines[<COMP_ID>]
+    - NO inline scene-sequencer scripts (the runtime drives clip visibility natively)
+    - NO multiple paused timelines (use ONE master tl with absolute positions)
+
+  Sub-30s vertical 1080×1920 reels work cleanly. Adjust data-duration on
+  the root + per-scene to retime; keep cumulative timing aligned with the
+  GSAP positions at the bottom.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>{{TITLE}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Substitute these from campaign.brandIdentity.palette */
+  :root {
+    --bg-primary: {{BG_PRIMARY}};        /* e.g. #0A0A0B */
+    --bg-elevated: {{BG_ELEVATED}};      /* e.g. #141416 */
+    --bg-deepest: {{BG_DEEPEST}};        /* e.g. #050507 */
+    --gold-primary: {{ACCENT}};          /* e.g. #F5A623 */
+    --gold-light: {{ACCENT_LIGHT}};      /* e.g. #FFB840 */
+    --alert: {{ALERT}};                  /* e.g. #FF5A5F */
+    --text: {{TEXT}};                    /* e.g. #EDEDED */
+    --text-muted: {{TEXT_MUTED}};        /* e.g. #8B8B92 */
+  }
+  html, body { margin:0; padding:0; background:var(--bg-primary); color:var(--text); font-family:'Inter',sans-serif; overflow:hidden; }
+  [data-composition-id="{{COMP_ID}}"] { position:relative; width:1080px; height:1920px; background:var(--bg-primary); overflow:hidden; }
+  [data-composition-id="{{COMP_ID}}"] .scene { position:absolute; inset:0; width:100%; height:100%; }
+  [data-composition-id="{{COMP_ID}}"] .scene-content { width:100%; height:100%; padding:160px 90px 220px 90px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:center; gap:36px; }
+  [data-composition-id="{{COMP_ID}}"] .watermark { position:absolute; right:36px; bottom:36px; font-family:'Instrument Serif',serif; font-weight:400; font-size:32px; letter-spacing:-0.01em; color:var(--gold-primary); opacity:0.85; z-index:50; }
+  [data-composition-id="{{COMP_ID}}"] .url { position:absolute; right:36px; bottom:88px; font-family:'Inter',sans-serif; font-weight:400; font-size:22px; color:var(--text-muted); z-index:50; }
+  [data-composition-id="{{COMP_ID}}"] .vignette { position:absolute; inset:0; background:radial-gradient(ellipse at center, transparent 55%, var(--bg-deepest) 100%); pointer-events:none; z-index:40; }
+  .s0-stamp { align-self:center; font-family:'Instrument Serif',serif; font-weight:400; font-size:200px; letter-spacing:0.02em; color:var(--gold-primary); text-transform:uppercase; border:6px solid var(--gold-primary); padding:40px 64px; transform:rotate(-4deg); text-align:center; line-height:1; }
+  .s0-sub { align-self:center; font-family:'Inter',sans-serif; font-weight:600; font-size:44px; letter-spacing:0.02em; color:var(--text); text-align:center; margin-top:24px; max-width:820px; }
+  .s0-kicker { align-self:center; font-family:'Inter',sans-serif; font-weight:700; font-size:28px; letter-spacing:0.32em; color:var(--gold-light); text-transform:uppercase; }
+  .list-label { font-family:'Inter',sans-serif; font-weight:700; font-size:30px; letter-spacing:0.32em; color:var(--gold-light); text-transform:uppercase; }
+  .list-num { font-family:'Instrument Serif',serif; font-weight:400; font-size:360px; line-height:0.85; letter-spacing:-0.02em; color:var(--gold-primary); }
+  .list-title { font-family:'Instrument Serif',serif; font-weight:400; font-size:92px; letter-spacing:-0.01em; line-height:1.05; color:var(--text); max-width:880px; }
+  .list-rule { width:0; height:4px; background:var(--gold-primary); border-radius:2px; }
+  .list-context { font-family:'Inter',sans-serif; font-weight:400; font-size:36px; line-height:1.45; color:var(--text-muted); max-width:860px; }
+  .list-tag { display:inline-block; font-family:'Inter',sans-serif; font-weight:700; font-size:24px; letter-spacing:0.2em; color:var(--gold-primary); text-transform:uppercase; border:2px solid var(--gold-primary); padding:10px 18px; align-self:flex-start; margin-top:8px; }
+  .s4-kicker { font-family:'Inter',sans-serif; font-weight:700; font-size:30px; letter-spacing:0.32em; color:var(--gold-light); text-transform:uppercase; }
+  .s4-headline { font-family:'Instrument Serif',serif; font-weight:400; font-size:100px; line-height:1.05; color:var(--text); letter-spacing:-0.01em; }
+  .s4-headline .accent { color:var(--gold-primary); }
+  .s4-act { font-family:'Inter',sans-serif; font-weight:700; font-size:36px; letter-spacing:0.06em; color:var(--gold-primary); text-transform:uppercase; }
+  .s4-penalty { font-family:'Inter',sans-serif; font-weight:400; font-size:38px; color:var(--text-muted); line-height:1.4; }
+  .s4-penalty strong { color:var(--text); font-weight:600; }
+  .end-content { align-items:center; justify-content:center; text-align:center; gap:28px; }
+  .end-wordmark { font-family:'Instrument Serif',serif; font-weight:400; font-size:140px; letter-spacing:-0.01em; color:var(--gold-primary); line-height:1; }
+  .end-fullname { font-family:'Inter',sans-serif; font-weight:600; font-size:32px; letter-spacing:0.24em; color:var(--gold-light); text-transform:uppercase; }
+  .end-tagline { font-family:'Instrument Serif',serif; font-weight:400; font-style:italic; font-size:56px; letter-spacing:-0.005em; color:var(--text); margin-top:32px; max-width:860px; }
+  .end-url { font-family:'Inter',sans-serif; font-weight:400; font-size:32px; color:var(--text-muted); letter-spacing:0.04em; }
+  .end-divider { width:120px; height:2px; background:var(--gold-primary); opacity:0.7; margin:16px 0; }
+</style>
+</head>
+<body>
+<div data-composition-id="{{COMP_ID}}" data-width="1080" data-height="1920" data-start="0" data-duration="32">
+  <div class="vignette"></div>
+
+  <div class="scene clip" id="s0" data-start="0" data-duration="2">
+    <div class="scene-content" style="justify-content:center;align-items:center;">
+      <div class="s0-kicker" id="s0-kicker">{{STAMP_KICKER}}</div>
+      <div class="s0-stamp" id="s0-stamp">{{STAMP}}</div>
+      <div class="s0-sub" id="s0-sub">{{STAMP_SUB}}</div>
+    </div>
+    <div class="watermark">{{BRAND_NAME}}</div>
+    <div class="url">{{BRAND_URL}}</div>
+  </div>
+
+  <div class="scene clip" id="s1" data-start="2" data-duration="7">
+    <div class="scene-content">
+      <div class="list-label" id="s1-label">{{LABEL_PREFIX}} 1 of 3</div>
+      <div class="list-num" id="s1-num">1</div>
+      <div class="list-title" id="s1-title">{{I1_TITLE}}</div>
+      <div class="list-rule" id="s1-rule"></div>
+      <div class="list-context" id="s1-context">{{I1_CONTEXT}}</div>
+      <div class="list-tag" id="s1-tag">{{I1_TAG}}</div>
+    </div>
+    <div class="watermark">{{BRAND_NAME}}</div>
+    <div class="url">{{BRAND_URL}}</div>
+  </div>
+
+  <div class="scene clip" id="s2" data-start="9" data-duration="7">
+    <div class="scene-content">
+      <div class="list-label" id="s2-label">{{LABEL_PREFIX}} 2 of 3</div>
+      <div class="list-num" id="s2-num">2</div>
+      <div class="list-title" id="s2-title">{{I2_TITLE}}</div>
+      <div class="list-rule" id="s2-rule"></div>
+      <div class="list-context" id="s2-context">{{I2_CONTEXT}}</div>
+      <div class="list-tag" id="s2-tag">{{I2_TAG}}</div>
+    </div>
+    <div class="watermark">{{BRAND_NAME}}</div>
+    <div class="url">{{BRAND_URL}}</div>
+  </div>
+
+  <div class="scene clip" id="s3" data-start="16" data-duration="7">
+    <div class="scene-content">
+      <div class="list-label" id="s3-label">{{LABEL_PREFIX}} 3 of 3</div>
+      <div class="list-num" id="s3-num">3</div>
+      <div class="list-title" id="s3-title">{{I3_TITLE}}</div>
+      <div class="list-rule" id="s3-rule"></div>
+      <div class="list-context" id="s3-context">{{I3_CONTEXT}}</div>
+      <div class="list-tag" id="s3-tag">{{I3_TAG}}</div>
+    </div>
+    <div class="watermark">{{BRAND_NAME}}</div>
+    <div class="url">{{BRAND_URL}}</div>
+  </div>
+
+  <div class="scene clip" id="s4" data-start="23" data-duration="5">
+    <div class="scene-content">
+      <div class="s4-kicker" id="s4-kicker">{{REVEAL_KICKER}}</div>
+      <div class="s4-headline" id="s4-headline">{{REVEAL_HEADLINE}}</div>
+      <div class="s4-act" id="s4-act">{{REVEAL_ACT}}</div>
+      <div class="s4-penalty" id="s4-penalty">{{REVEAL_PENALTY}}</div>
+    </div>
+    <div class="watermark">{{BRAND_NAME}}</div>
+    <div class="url">{{BRAND_URL}}</div>
+  </div>
+
+  <div class="scene clip" id="s5" data-start="28" data-duration="4">
+    <div class="scene-content end-content">
+      <div class="end-wordmark" id="s5-wordmark">{{END_WORDMARK}}</div>
+      <div class="end-fullname" id="s5-fullname">{{END_FULLNAME}}</div>
+      <div class="end-divider" id="s5-divider"></div>
+      <div class="end-tagline" id="s5-tagline">{{END_TAGLINE}}</div>
+      <div class="end-url" id="s5-url">{{BRAND_URL}}</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<script>
+  window.__timelines = window.__timelines || {};
+  const tl = gsap.timeline({ paused: true });
+  tl.from("#s0-kicker", { y:-30, opacity:0, duration:0.5, ease:"power2.out" }, 0.15);
+  tl.from("#s0-stamp",  { scale:1.4, opacity:0, duration:0.5, ease:"power3.inOut" }, 0.35);
+  tl.from("#s0-sub",    { y:30, opacity:0, duration:0.55, ease:"power2.out" }, 0.85);
+  tl.from("#s1-label",  { x:-60, opacity:0, duration:0.5, ease:"power2.out" }, 2.2);
+  tl.from("#s1-num",    { y:80, opacity:0, duration:0.7, ease:"power3.inOut" }, 2.4);
+  tl.from("#s1-title",  { x:-80, opacity:0, duration:0.6, ease:"power2.out" }, 2.7);
+  tl.to  ("#s1-rule",   { width:320, duration:0.5, ease:"power3.inOut" }, 3.2);
+  tl.from("#s1-context",{ y:30, opacity:0, duration:0.55, ease:"power2.out" }, 3.5);
+  tl.from("#s1-tag",    { scale:0.9, opacity:0, duration:0.4, ease:"power2.out" }, 4.0);
+  tl.from("#s2-label",  { x:-60, opacity:0, duration:0.5, ease:"power2.out" }, 9.2);
+  tl.from("#s2-num",    { y:80, opacity:0, duration:0.7, ease:"power3.inOut" }, 9.4);
+  tl.from("#s2-title",  { x:-80, opacity:0, duration:0.6, ease:"power2.out" }, 9.7);
+  tl.to  ("#s2-rule",   { width:320, duration:0.5, ease:"power3.inOut" }, 10.2);
+  tl.from("#s2-context",{ y:30, opacity:0, duration:0.55, ease:"power2.out" }, 10.5);
+  tl.from("#s2-tag",    { scale:0.9, opacity:0, duration:0.4, ease:"power2.out" }, 11.0);
+  tl.from("#s3-label",  { x:-60, opacity:0, duration:0.5, ease:"power2.out" }, 16.2);
+  tl.from("#s3-num",    { y:80, opacity:0, duration:0.7, ease:"power3.inOut" }, 16.4);
+  tl.from("#s3-title",  { x:-80, opacity:0, duration:0.6, ease:"power2.out" }, 16.7);
+  tl.to  ("#s3-rule",   { width:320, duration:0.5, ease:"power3.inOut" }, 17.2);
+  tl.from("#s3-context",{ y:30, opacity:0, duration:0.55, ease:"power2.out" }, 17.5);
+  tl.from("#s3-tag",    { scale:0.9, opacity:0, duration:0.4, ease:"power2.out" }, 18.0);
+  tl.from("#s4-kicker",  { y:-30, opacity:0, duration:0.55, ease:"power2.out" }, 23.2);
+  tl.from("#s4-headline",{ y:50, opacity:0, duration:0.7, ease:"power3.inOut" }, 23.5);
+  tl.from("#s4-act",     { x:-40, opacity:0, duration:0.5, ease:"power2.out" }, 24.1);
+  tl.from("#s4-penalty", { y:30, opacity:0, duration:0.6, ease:"power2.out" }, 24.5);
+  tl.from("#s5-wordmark", { scale:0.85, opacity:0, duration:0.7, ease:"power3.inOut" }, 28.2);
+  tl.from("#s5-fullname", { y:20, opacity:0, duration:0.55, ease:"power2.out" }, 28.7);
+  tl.fromTo("#s5-divider",{ width:0 },{ width:120, duration:0.45, ease:"power3.inOut" }, 29.0);
+  tl.from("#s5-tagline",  { y:25, opacity:0, duration:0.55, ease:"power2.out" }, 29.2);
+  tl.from("#s5-url",      { y:20, opacity:0, duration:0.5, ease:"power2.out" }, 29.5);
+  tl.to("#s5", { opacity:0, duration:0.5, ease:"power2.in" }, 31.4);
+  window.__timelines["{{COMP_ID}}"] = tl;
+</script>
+</body>
+</html>
+<!--
+  Worked example (PiB V1) for reference:
+    {{TITLE}}=PiB — V1-website-vs-app
+    {{COMP_ID}}=v1-pib-app
+    {{BRAND_NAME}}=Partners in Biz   {{BRAND_URL}}=partnersinbiz.online
+    {{BG_PRIMARY}}=#0A0A0B  {{ACCENT}}=#F5A623  {{TEXT}}=#EDEDED  {{TEXT_MUTED}}=#8B8B92
+    {{LABEL_PREFIX}}=Myth
+    {{STAMP_KICKER}}=South African SMEs   {{STAMP}}=MYTH   {{STAMP_SUB}}=3 reasons you don't need an app
+    {{I1_TITLE}}=Your competitor has one.   {{I1_CONTEXT}}=Their app does not bring them new customers. Yours won't either.   {{I1_TAG}}=Doesn't matter
+    {{REVEAL_KICKER}}=The fact is
+    {{REVEAL_HEADLINE}}=<span class="accent">90%</span> find you<br/>on mobile web.
+    {{REVEAL_ACT}}=Statista 2025
+    {{REVEAL_PENALTY}}=Useless app: <strong>R150,000+</strong>. Fast site: <strong>R30,000</strong>.
+    {{END_WORDMARK}}=PiB   {{END_FULLNAME}}=Partners in Biz   {{END_TAGLINE}}=Start with the right platform.
+-->
+
