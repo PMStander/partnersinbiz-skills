@@ -5,7 +5,7 @@
   "minApiVersion": "2026-07-23",
   "channel": "stable",
   "decisions": {
-    "repo": "PMStander/partnersinbiz-skills",
+    "repo": "Partners-in-Biz/partnersinbiz-skills",
     "interactiveAuth": "user-delegation-or-device-oauth",
     "systemAuth": "platform-or-agent-key-cron-only",
     "versionPinning": "env-pin-with-stable-channel-alias",

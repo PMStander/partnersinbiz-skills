@@ -2,7 +2,7 @@
 
 Public skill pack so **your** Cursor, Claude Code, or Hermes agent can operate a Partners in Biz workspace as **you**.
 
-Repo: [github.com/PMStander/partnersinbiz-skills](https://github.com/PMStander/partnersinbiz-skills)
+Repo: [github.com/Partners-in-Biz/partnersinbiz-skills](https://github.com/Partners-in-Biz/partnersinbiz-skills)
 
 Admin and ops skills are included. The API still returns 403 when your membership cannot do the action. Do not use a platform god-key.
 
@@ -11,8 +11,8 @@ Admin and ops skills are included. The API still returns 403 when your membershi
 ### Cursor
 
 ```bash
-git clone https://github.com/PMStander/partnersinbiz-skills.git ~/.cursor/skills/partnersinbiz-skills
-# or: npx skills add PMStander/partnersinbiz-skills
+git clone https://github.com/Partners-in-Biz/partnersinbiz-skills.git ~/.cursor/skills/partnersinbiz-skills
+# or: npx skills add Partners-in-Biz/partnersinbiz-skills
 ```
 
 You can also clone into `~/.agents/skills/partnersinbiz-skills`.
@@ -20,13 +20,13 @@ You can also clone into `~/.agents/skills/partnersinbiz-skills`.
 ### Claude Code
 
 ```bash
-git clone https://github.com/PMStander/partnersinbiz-skills.git ~/.claude/skills/partnersinbiz
+git clone https://github.com/Partners-in-Biz/partnersinbiz-skills.git ~/.claude/skills/partnersinbiz
 ```
 
 ### Hermes
 
 ```bash
-git clone https://github.com/PMStander/partnersinbiz-skills.git
+git clone https://github.com/Partners-in-Biz/partnersinbiz-skills.git
 cd partnersinbiz-skills
 ./bin/pib-skills install all
 ```
